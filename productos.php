@@ -1,5 +1,7 @@
 <?php
 
+require_once('base_datos.php'); // Se necesita un archivo externo
+
 // verificar GET
 if($_SERVER['REQUEST_METHOD'] == 'GET')
 {
@@ -14,8 +16,14 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
 
         // Obtener pares clave valor
         $folio = $_GET['folio'];
+
+        // Busqueda por numero de folio en base de datos
+        $producto = buscar_folio($folio);
     } else {
         // 2: Consultar todo
+
+        // Obtiene todos los productos de la base de datos
+        $productos = buscar_todo();
         header('Content-Type: application/json'); // La respuesta es en JSON
         $respuesta = [
             'mensaje' => 'Proceso exitoso',
@@ -41,13 +49,15 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
 
         echo(json_encode($respuesta));
     }
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST')
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') // Registrar
 {
     // Procesar POST
 
     // Obtener valores de la solicitud
     $folio  = $_POST['folio'];
     $nombre = $_POST['nombre'];
+
+    $resultado = insertar($folio, $nombre, $color, $costo, $unidad_medida, $fecha_baja);
 
     // Algoritmo o proceso
     header('Content-Type: application/json'); // La respuesta es en JSON
@@ -57,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
     ];
 
     echo(json_encode($respuesta));
-} elseif ($_SERVER['REQUEST_METHOD'] == 'PUT')
+} elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') // Actualizar
 {
     // Procesar PUT
 
@@ -68,6 +78,8 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
     $folio = $datos_recibidos->folio;
     $nombre = $datos_recibidos->nombre;
 
+    $resultado = actualizar($folio, $nombre, $color, $costo, $unidad_medida, $fecha_baja);
+
     // Algoritmo o proceso
     header('Content-Type: application/json'); // La respuesta es en JSON
 
@@ -76,11 +88,13 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
     ];
 
     echo(json_encode($respuesta));
-} elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE')
+} elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE') // Eliminar
 {
     // Procesar DELETE
 
     $folio = $_GET['folio'];
+
+    $resultado = eliminar($folio);
 
     // Algoritmo o proceso
     header('Content-Type: application/json'); // La respuesta es en JSON
