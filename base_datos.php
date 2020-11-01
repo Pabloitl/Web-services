@@ -1,6 +1,6 @@
 <?php
 
-define('DB_HOST','localhost');
+define('DB_HOST','localhost:3306');
 define('DB_USER','mariadb');
 define('DB_PASS','mariadb');
 define('DB_NAME','mariadb');
@@ -37,7 +37,7 @@ function buscar_folio($folio) {
 	$query->execute();
 	$results = $query -> fetchAll(PDO::FETCH_OBJ);
 
-	if (is_array($results)) {
+	if (isset($results[0]) && is_array($results)) {
 		return $results[0];
 	} else {
 		return false;

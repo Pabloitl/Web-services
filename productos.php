@@ -19,54 +19,103 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
 
         // Busqueda por numero de folio en base de datos
         $producto = buscar_folio($folio);
+
+        // Responder la solicitud
+        if ($producto != null) { // Si se encontro el producto
+            // Si lo encontro
+            header('Content-Type: application/json');
+            $respuesta = [
+                'producto' => (object) [
+                    'folio'         => $producto->folio,
+                    'nombre'        => $producto->nombre,
+                    'color'         => $producto->color,
+                    'costo'         => $producto->costo,
+                    'unidad_medida' => $producto->unidad_medida,
+                    'fecha_baja'    => $producto->fecha_baja
+                ]
+            ];
+
+            // Enviar
+            echo(json_encode($respuesta));
+        } else {
+            // No lo encontro
+            header('Content-Type: application/json');
+            $respuesta = [
+                'producto' => (object) [ ]
+            ];
+
+            // Enviar
+            echo(json_encode($respuesta));
+        }
     } else {
         // 2: Consultar todo
 
         // Obtiene todos los productos de la base de datos
         $productos = buscar_todo();
-        header('Content-Type: application/json'); // La respuesta es en JSON
-        $respuesta = [
-            'mensaje' => 'Proceso exitoso',
-            'productos' => [
-                (object) [
-                    'folio'         => '001',
-                    'nombre'        => 'Arroz',
-                    'color'         => 'Blanco',
-                    'costo'         => 25.50,
-                    'unidad_medida' => 'Gramos',
-                    'fecha_baja'    => null
-                ],
-                (object) [
-                    'folio'         => '002',
-                    'nombre'        => 'Malla metalica',
-                    'color'         => 'Cromo',
-                    'costo'         => 40.80,
-                    'unidad_medida' => 'Metros',
-                    'fecha_baja'    => null
-                ]
-            ]
+
+        if (is_array($productos) && sizeof($productos) > 0) { // Si tiene productos
+            // Si tiene elementos
+            header('Content-Type: application/json');
+
+            $array_productos = [];
+            foreach ($productos as $item) { // Obtener todos los productos de la base de datos
+                $array_productos[] = $item;
+            }
+
+            $respuesta = [
+                'mensaje' => 'Proceso exitoso',
+                'productos' => $array_productos
+            ];
+
+            // Enviar
+            echo(json_encode($respuesta));
+        } else {
+            // No hay elementos
+            header('Content-Type: application/json');
+            $respuesta = [
+                'mensaje' => 'Proceso exitoso',
+                'productos' => [ ]
         ];
 
-        echo(json_encode($respuesta));
+            // Enviar
+            echo(json_encode($respuesta));
+        }
     }
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') // Registrar
 {
     // Procesar POST
 
     // Obtener valores de la solicitud
-    $folio  = $_POST['folio'];
-    $nombre = $_POST['nombre'];
+    $datos_recibidos = json_decode(
+        file_get_contents('php://input')
+    );
 
+    $folio         = $datos_recibidos->folio;
+    $nombre        = $datos_recibidos->nombre;
+    $color         = $datos_recibidos->color;
+    $costo         = $datos_recibidos->costo;
+    $unidad_medida = $datos_recibidos->unidad_medida;
+    $fecha_baja    = $datos_recibidos->fecha_baja;
+
+    // Registrar en la base de datos
+    // $resultado = insertar($folio, $nombre, $color, $costo, $unidad_medida, $fecha_baja);
     $resultado = insertar($folio, $nombre, $color, $costo, $unidad_medida, $fecha_baja);
 
-    // Algoritmo o proceso
-    header('Content-Type: application/json'); // La respuesta es en JSON
-
-    $respuesta = [
-        'mensaje' => 'Registro exitoso'
-    ];
-
-    echo(json_encode($respuesta));
+    if ($resultado != null) {
+        // Si se realizo
+        header('Content-Type: application/json'); // La respuesta es en JSON
+        $respuesta = [
+            'mensaje' => 'Registro exitoso'
+        ];
+        echo(json_encode($respuesta));
+    } else {
+        // No se realizo
+        header('Content-Type: application/json'); // La respuesta es en JSON
+        $respuesta = [
+            'mensaje' => 'No se pudo registrar'
+        ];
+        echo(json_encode($respuesta));
+    }
 } elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') // Actualizar
 {
     // Procesar PUT
@@ -75,19 +124,37 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
         file_get_contents('php://input')
     );
 
+    $folio         = $datos_recibidos->folio;
+    $nombre        = $datos_recibidos->nombre;
+    $color         = $datos_recibidos->color;
+    $costo         = $datos_recibidos->costo;
+    $unidad_medida = $datos_recibidos->unidad_medida;
+    $fecha_baja    = $datos_recibidos->fecha_baja;
+
     $folio = $datos_recibidos->folio;
     $nombre = $datos_recibidos->nombre;
 
     $resultado = actualizar($folio, $nombre, $color, $costo, $unidad_medida, $fecha_baja);
 
-    // Algoritmo o proceso
-    header('Content-Type: application/json'); // La respuesta es en JSON
+    if ($resultado != null) {
+        // Si se actualizo
+        header('Content-Type: application/json'); // La respuesta es en JSON
 
-    $respuesta = [
-        'mensaje' => 'Registro exitoso'
-    ];
+        $respuesta = [
+            'mensaje' => 'Actualizacion correcta'
+        ];
 
-    echo(json_encode($respuesta));
+        echo(json_encode($respuesta));
+    } else {
+        // No se actualizo
+        header('Content-Type: application/json'); // La respuesta es en JSON
+
+        $respuesta = [
+            'mensaje' => 'No se pudo actualizar'
+        ];
+
+        echo(json_encode($respuesta));
+    }
 } elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE') // Eliminar
 {
     // Procesar DELETE
@@ -96,14 +163,25 @@ if($_SERVER['REQUEST_METHOD'] == 'GET')
 
     $resultado = eliminar($folio);
 
-    // Algoritmo o proceso
-    header('Content-Type: application/json'); // La respuesta es en JSON
+    if ($resultado != null) {
+        // Si se elimino
+        header('Content-Type: application/json'); // La respuesta es en JSON
 
-    $respuesta = [
-        'mensaje' => 'Registro exitoso' . ' ' . $folio
-    ];
+        $respuesta = [
+            'mensaje' => 'Eliminacion correcta'
+        ];
 
-    echo(json_encode($respuesta));
+        echo(json_encode($respuesta));
+    } else {
+        // No se elimino
+        header('Content-Type: application/json'); // La respuesta es en JSON
+
+        $respuesta = [
+            'mensaje' => 'No se pudo eliminar'
+        ];
+
+        echo(json_encode($respuesta));
+    }
 } else
 {
     // Procesar error y responder

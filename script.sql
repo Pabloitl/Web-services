@@ -1,4 +1,4 @@
-drop database mariadb;
+drop database if exists mariadb;
 create database mariadb;
 
 use mariadb;
