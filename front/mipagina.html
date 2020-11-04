@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web services</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            $("#btn_genera_json").click(() => {
+                // Mandamos un mensaje
+                // alert('Hola!');
+
+                // Obtener valor del input folio
+                let folio = $("#folio").val();
+
+                let json = {
+                    folio: $("#folio").val()
+                }
+
+                // Mostrar en consola
+                console.log(json);
+            });
+            $("#btn_limpiar").click(() => {
+                $("input").val("");
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Ejercicio jQuery</h1>
+    <br>
+    Folio: <input type="text" name="folio" id="folio">
+    <br>
+    Nombre: <input type="text" name="nombre" id="nombre">
+    <br>
+    Color: <input type="text" name="color" id="color">
+    <br>
+    Costo: <input type="number" name="costo" id="costo">
+    <br>
+    Unidad de medida: <input type="text" name="unidad_medida" id="unidad_medida">
+    <br><br>
+    <button id="btn_genera_json">Generar JSON</button>
+    <button id="btn_limpiar">Limpiar</button>
+</body>
+</html>
