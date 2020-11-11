@@ -102,18 +102,23 @@ function cargar_producto(folio) {
 	$("#btn_editar").attr('hidden', false);
 
 	$.ajax({
-        url: '/productos.php',
+        url: '/proyecto/productos.php',
         type: "GET",
         // COMPLETAR - ENVIAR EL FOLIO
         data: {
-
+			folio: folio
         },
         success: function (data) {
         	// COMPLETAR - VERIFICAR QUE EXISTA EL PRODUCTO
             if (data.producto) {
             	let producto = data.producto;
-                // COMPLETAR - CARGAR LOS DATOS EN EL FORMULARIO
-
+				// COMPLETAR - CARGAR LOS DATOS EN EL FORMULARIO
+				$('#folio').val(producto.folio);
+				$('#nombre').val(producto.nombre);
+				$('#color').val(producto.color);
+				$('#costo').val(producto.costo);
+				$('#unidad_medida').val(producto.unidad_medida);
+				$('#fecha_baja').val(producto.fecha_baja);
             } else {
             	alert('No se encontró el producto');
             }
@@ -128,16 +133,24 @@ function cargar_producto(folio) {
 function actualiza_producto() {
 	// COMPLETAR - DEFINIR EL JSON A ENVIAR CON LOS DATOS DEL PRODUCTO
 	let json_producto = {
-
+		folio: $('#folio').val(),
+		nombre: $('#nombre').val(),
+		color: $('#color').val(),
+		costo: $('#costo').val(),
+		unidad_medida: $('#unidad_medida').val(),
+		fecha_baja: $('#fecha_baja').val()
     };
 
 	$.ajax({
-        url: '/productos.php',
+        url: './productos.php',
         type: "PUT",
         // COMPLETAR - ENVIAR EL JSON DEL PRODUCTO
-        data: JSON.stringify(), // CONVERTIR EN STRING JSON
+        data: JSON.stringify(json_producto), // CONVERTIR EN STRING JSON
         success: function (data) {
-        	// COMPLETAR - PROCESAR RESPUESTA
+			// COMPLETAR - PROCESAR RESPUESTA
+			alert(data.mensaje);
+
+			location.reload();
         },
         error: function (xhr, status) {
             alert("Ha ocurrido un error! " + status);
@@ -150,11 +163,13 @@ function eliminar_producto(folio) {
 	if (confirm('¿Está seguro de eliminar el producto con folio: ' + folio + '?')) {
 		$.ajax({
 			// COMPLETAR - ENVIAR EL FOLIO EN LA URL
-	        url: '/productos.php',
+	        url: './productos.php?folio=' + folio,
 	        type: "DELETE",
 	        success: function (data) {
 	        	// COMPLETAR - PROCESAR RESPUESTA
+				alert(data.mensaje);
 
+				location.reload();
 	        },
 	        error: function (xhr, status) {
 	            alert("Ha ocurrido un error! " + status);
